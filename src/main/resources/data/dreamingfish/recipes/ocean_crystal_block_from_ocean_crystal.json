@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "XXX",
+    "XXX",
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "item": "dreamingfish:ocean_crystal"
+    }
+  },
+  "result": {
+    "item": "dreamingfish:ocean_crystal_block",
+    "count": 1
+  }
+}

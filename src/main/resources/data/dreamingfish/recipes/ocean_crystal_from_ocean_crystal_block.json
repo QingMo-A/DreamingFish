@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "categories": "building",
+  "ingredients": [
+    {
+      "item": "dreamingfish:ocean_crystal_block"
+    }
+  ],
+  "result": {
+    "item": "dreamingfish:ocean_crystal",
+    "count": 9
+    }
+}

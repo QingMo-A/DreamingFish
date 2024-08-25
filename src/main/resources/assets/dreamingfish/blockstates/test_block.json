@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "dreamingfish:block/test_block"
+    }
+  }
+}
