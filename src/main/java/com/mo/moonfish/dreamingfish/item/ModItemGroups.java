@@ -21,12 +21,15 @@ public class ModItemGroups {
                         entries.add(ModBlocks.OCEAN_CRYSTAL_ORE);
                         entries.add(ModBlocks.DEEPSLATE_OCEAN_CRYSTAL_ORE);
                         entries.add(ModBlocks.OCEAN_CRYSTAL_BLOCK);
+                        entries.add(ModBlocks.CARVED_OCEAN_CRYSTAL_BLOCK);
+                        entries.add(ModItems.DREAM);
                         entries.add(ModItems.OCEAN_CRYSTAL);
                         entries.add(ModItems.BROKEN_OCEAN_CRYSTAL);
                         entries.add(ModItems.MINERAL_DETECTOR);
                         entries.add(ModItems.FISH_SOUP);
                         entries.add(ModItems.WORMHOLE_POTION);
                         entries.add(ModItems.CALL_PHONE);
+                        entries.add(ModItems.CARVING_KNIFE);
                         entries.add(ModBlocks.TEST_BLOCK);
                     })).build());
 

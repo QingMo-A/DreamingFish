@@ -7,6 +7,8 @@ import com.mo.moonfish.dreamingfish.item.items.potion.WormholePotion;
 import com.mo.moonfish.dreamingfish.item.items.raw_material.BrokenOceanCrystal;
 import com.mo.moonfish.dreamingfish.item.items.raw_material.OceanCrystal;
 import com.mo.moonfish.dreamingfish.item.items.tool.CallPhone;
+import com.mo.moonfish.dreamingfish.item.items.tool.CarvingKnife;
+import com.mo.moonfish.dreamingfish.item.items.tool.Dream;
 import com.mo.moonfish.dreamingfish.item.items.tool.MineralDetector;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.item.Item;
@@ -22,6 +24,8 @@ public class ModItems {
     // tool
     public static final Item MINERAL_DETECTOR = registerItem(MineralDetector.ITEM_ID, new MineralDetector(new FabricItemSettings().maxCount(1).maxDamage(64)));
     public static final Item CALL_PHONE = registerItem(CallPhone.ITEM_ID, new CallPhone(new FabricItemSettings().maxCount(1)));
+    public static final Item CARVING_KNIFE = registerItem(CarvingKnife.ITEM_ID, new CarvingKnife(new FabricItemSettings().maxCount(1).maxDamage(5)));
+    public static final Item DREAM = registerItem(Dream.ITEM_ID, new Dream(new FabricItemSettings().maxCount(1).maxDamage(5)));
 
     // armor
 

@@ -7,10 +7,12 @@
   "item.dreamingfish.mineral_detector": "Mineral Detector",
   "mineral_detector_output_found": "Found %s",
   "mineral_detector_output_not_found": "Nothing of value was found",
-
   "item.dreamingfish.call_phone": "Call Phone",
+  "item.dreamingfish.carving_knife": "Carving Knife",
+  "item.dreamingfish.dream": "Dream",
 
   "block.dreamingfish.ocean_crystal_block": "Ocean Crystal Block",
+  "block.dreamingfish.carved_ocean_crystal_block": "Carved Ocean Crystal Block",
   "block.dreamingfish.ocean_crystal_ore": "Ocean Crystal Ore",
   "block.dreamingfish.deepslate_ocean_crystal_ore": "Deepslate Ocean Crystal Ore",
   "block.dreamingfish.test_block": "Test Block",

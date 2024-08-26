@@ -10,14 +10,24 @@ import com.mo.moonfish.dreamingfish.economy.BankManager;
 import com.mo.moonfish.dreamingfish.entity.ModBlockEntities;
 import com.mo.moonfish.dreamingfish.item.ModItemGroups;
 import com.mo.moonfish.dreamingfish.item.ModItems;
+import com.mo.moonfish.dreamingfish.item.items.tool.Dream;
 import com.mo.moonfish.dreamingfish.loot.LootTableModifiers;
+import com.mo.moonfish.dreamingfish.mixin.ModTags;
 import com.mo.moonfish.dreamingfish.world.gen.ModWorldGeneration;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.kyrptonaught.customportalapi.api.CustomPortalBuilder;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +86,13 @@ public class DreamingFish implements ModInitializer {
 				applyDailyInterest(server);
 			}
 		});
+
+		CustomPortalBuilder.beginPortal()
+				.frameBlock(ModBlocks.CARVED_OCEAN_CRYSTAL_BLOCK)
+				.lightWithItem(ModItems.DREAM)
+				.destDimID(new Identifier(DreamingFish.MOD_ID, "dreaming"))
+				.tintColor(0x76efa)
+				.registerPortal();
 	}
 
 	private void applyDailyInterest(MinecraftServer server) {

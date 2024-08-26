@@ -1,18 +1,17 @@
 package com.mo.moonfish.dreamingfish.block;
 
 import com.mo.moonfish.DreamingFish;
-import com.mo.moonfish.dreamingfish.block.blocks.DeepslateOceanCrystalOre;
-import com.mo.moonfish.dreamingfish.block.blocks.OceanCrystalBlock;
-import com.mo.moonfish.dreamingfish.block.blocks.OceanCrystalOre;
-import com.mo.moonfish.dreamingfish.block.blocks.TestBlock;
+import com.mo.moonfish.dreamingfish.block.blocks.*;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
 
@@ -20,6 +19,10 @@ public class ModBlocks {
     public static final Block OCEAN_CRYSTAL_BLOCK = registerBlock(
             OceanCrystalBlock.BLOCK_ID,
             new OceanCrystalBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)));
+
+    public static final Block CARVED_OCEAN_CRYSTAL_BLOCK = registerBlock(
+            CarvedOceanCrystalBlock.BLOCK_ID,
+            new CarvedOceanCrystalBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)));
 
     public static final Block OCEAN_CRYSTAL_ORE = registerBlock(
             OceanCrystalOre.BLOCK_ID,

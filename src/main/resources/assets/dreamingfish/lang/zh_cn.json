@@ -8,8 +8,11 @@
   "mineral_detector_output_found": "发现 %s",
   "mineral_detector_output_not_found": "没有发现有价值的东西",
   "item.dreamingfish.call_phone": "手机",
+  "item.dreamingfish.carving_knife": "刻刀",
+  "item.dreamingfish.dream": "梦",
 
   "block.dreamingfish.ocean_crystal_block": "海洋水晶块",
+  "block.dreamingfish.carved_ocean_crystal_block": "雕刻的海洋水晶块",
   "block.dreamingfish.ocean_crystal_ore": "海洋水晶矿",
   "block.dreamingfish.deepslate_ocean_crystal_ore": "深层海洋水晶矿",
   "block.dreamingfish.test_block": "测试方块",

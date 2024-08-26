@@ -1,6 +1,8 @@
 package com.mo.moonfish;
 
 import com.mo.moonfish.dreamingfish.datagen.ModWorldGenerator;
+import com.mo.moonfish.dreamingfish.dimension.ModDimensions;
+import com.mo.moonfish.dreamingfish.world.biome.ModBiomes;
 import com.mo.moonfish.dreamingfish.world.gen.ModConfiguredFeatures;
 import com.mo.moonfish.dreamingfish.world.gen.ModPlacedFeatures;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
@@ -20,5 +22,7 @@ public class DreamingFishDataGenerator implements DataGeneratorEntrypoint {
 	public void buildRegistry(RegistryBuilder registryBuilder) {
 		registryBuilder.addRegistry(RegistryKeys.CONFIGURED_FEATURE, ModConfiguredFeatures::boostrap);
 		registryBuilder.addRegistry(RegistryKeys.PLACED_FEATURE, ModPlacedFeatures::boostrap);
+		registryBuilder.addRegistry(RegistryKeys.BIOME, ModBiomes::boostrap);
+		registryBuilder.addRegistry(RegistryKeys.DIMENSION_TYPE, ModDimensions::bootstrapType);
 	}
 }

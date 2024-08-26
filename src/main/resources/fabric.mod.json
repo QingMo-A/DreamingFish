@@ -20,6 +20,9 @@
 		],
 		"fabric-datagen": [
 			"com.mo.moonfish.DreamingFishDataGenerator"
+		],
+		"terrablender": [
+			"com.mo.moonfish.dreamingfish.world.biome.ModTerrablenderAPI"
 		]
 	},
 	"mixins": [
