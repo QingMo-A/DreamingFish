@@ -23,6 +23,9 @@
 		],
 		"terrablender": [
 			"com.mo.moonfish.dreamingfish.world.biome.ModTerrablenderAPI"
+		],
+		"client": [
+			"com.mo.moonfish.dreamingfish.network.ModListClientHandler"
 		]
 	},
 	"mixins": [

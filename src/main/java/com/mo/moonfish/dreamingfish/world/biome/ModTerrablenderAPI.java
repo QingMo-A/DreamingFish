@@ -13,5 +13,6 @@ public class ModTerrablenderAPI implements TerraBlenderApi {
         Regions.register(new ModOverworldRegion(new Identifier(DreamingFish.MOD_ID, "overworld"), 4));
 
         SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, DreamingFish.MOD_ID, ModMaterialRules.makeRules());
+        SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, DreamingFish.MOD_ID, ModMaterialRules.makeRules());
     }
 }

@@ -1,6 +1,7 @@
 package com.mo.moonfish;
 
 import com.mo.moonfish.dreamingfish.block.ModBlocks;
+import com.mo.moonfish.dreamingfish.command.commands.ModListCommand;
 import com.mo.moonfish.dreamingfish.command.commands.economy.EconomyCommand;
 import com.mo.moonfish.dreamingfish.command.commands.economy.MarketCommand;
 import com.mo.moonfish.dreamingfish.command.commands.economy.WelfareCommand;
@@ -8,28 +9,37 @@ import com.mo.moonfish.dreamingfish.command.commands.tpa.TPACommand;
 import com.mo.moonfish.dreamingfish.command.commands.tpa.TPAHandler;
 import com.mo.moonfish.dreamingfish.economy.BankManager;
 import com.mo.moonfish.dreamingfish.entity.ModBlockEntities;
+import com.mo.moonfish.dreamingfish.event.PlayerEventHandlers;
 import com.mo.moonfish.dreamingfish.item.ModItemGroups;
 import com.mo.moonfish.dreamingfish.item.ModItems;
 import com.mo.moonfish.dreamingfish.item.items.tool.Dream;
 import com.mo.moonfish.dreamingfish.loot.LootTableModifiers;
 import com.mo.moonfish.dreamingfish.mixin.ModTags;
+import com.mo.moonfish.dreamingfish.network.ModListServerHandler;
+import com.mo.moonfish.dreamingfish.scoreboard.ScoreboardManager;
 import com.mo.moonfish.dreamingfish.world.gen.ModWorldGeneration;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.kyrptonaught.customportalapi.api.CustomPortalBuilder;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DreamingFish implements ModInitializer {
 	// 模组ID
@@ -64,6 +74,9 @@ public class DreamingFish implements ModInitializer {
 		// 注册经济命令
 		MarketCommand.registerCommands();
 
+		// 注册模组标签
+		ModListCommand.register();
+
 		// 注册福利命令
 		WelfareCommand.registerCommands();
 
@@ -93,6 +106,23 @@ public class DreamingFish implements ModInitializer {
 				.destDimID(new Identifier(DreamingFish.MOD_ID, "dreaming"))
 				.tintColor(0x76efa)
 				.registerPortal();
+
+		// 注册监听客户端返回数据的处理方法
+		ServerPlayNetworking.registerGlobalReceiver(ModListCommand.GET_MOD_LIST_PACKET_ID, (server, player, handler, buf, responseSender) -> {
+			int size = buf.readInt();
+			List<String> modList = new ArrayList<>();
+
+			for (int i = 0; i < size; i++) {
+				modList.add(buf.readString(32767));
+			}
+
+			server.execute(() -> {
+				ModListCommand.handleModListResponse(player, modList);
+			});
+		});
+
+		ModListServerHandler.register();
+
 	}
 
 	private void applyDailyInterest(MinecraftServer server) {

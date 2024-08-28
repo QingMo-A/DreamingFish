@@ -54,7 +54,7 @@ public class EconomyCommand {
                             bankManager.deposit(player, amount);
 
                             // 反馈给玩家
-                            player.sendMessage(Text.translatable("deposit_success", String.format("%.2f", amount), economyManager.getBalance(player)), false);
+                            player.sendMessage(Text.translatable("deposit_success", String.format("%.2f", amount), bankManager.getBankBalance(player)), false);
                             return 1;
                         }))
         );
@@ -80,7 +80,7 @@ public class EconomyCommand {
                             economyManager.addBalance(player, amount);
 
                             // 反馈给玩家
-                            player.sendMessage(Text.translatable("withdrew_success", String.format("%.2f", amount), economyManager.getBalance(player)), false);
+                            player.sendMessage(Text.translatable("withdrew_success", String.format("%.2f", amount), bankManager.getBankBalance(player)), false);
                             return 1;
                         }))
         );

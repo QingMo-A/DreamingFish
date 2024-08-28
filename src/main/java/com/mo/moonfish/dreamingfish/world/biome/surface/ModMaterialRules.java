@@ -19,12 +19,29 @@ public class ModMaterialRules {
 
         return MaterialRules.sequence(
                 MaterialRules.sequence(MaterialRules.condition(MaterialRules.biome(ModBiomes.TEST_BIOME),
-                        MaterialRules.condition(MaterialRules.STONE_DEPTH_FLOOR, OCEAN_CRYSTAL_ORE)),
-                        MaterialRules.condition(MaterialRules.STONE_DEPTH_CEILING, OCEAN_CRYSTAL_BLOCK)),
+                        MaterialRules.condition(MaterialRules.STONE_DEPTH_FLOOR, GRASS_BLOCK)),
+                        MaterialRules.condition(MaterialRules.STONE_DEPTH_CEILING, DIRT)),
 
                 MaterialRules.condition(MaterialRules.STONE_DEPTH_FLOOR, grassSurface)
         );
     }
+
+    public static MaterialRules.MaterialRule makeRules2() {
+        // 在 TEST_BIOME 生物群系中，将地表设置为草方块，下层为泥土
+        return MaterialRules.sequence(
+                MaterialRules.condition(
+                        MaterialRules.biome(ModBiomes.NEW_BIOME),
+                        MaterialRules.sequence(
+                                // 设置地表为草方块
+                                MaterialRules.condition(MaterialRules.surface(), GRASS_BLOCK),
+                                // 设置草方块以下为泥土
+                                DIRT
+                        )
+                )
+        );
+    }
+
+
 
     private static MaterialRules.MaterialRule makeStateRule(Block block) {
         return MaterialRules.block(block.getDefaultState());
