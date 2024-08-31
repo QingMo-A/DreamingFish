@@ -9,7 +9,7 @@ import java.util.*;
 
 public class EconomyManager extends PersistentState {
     private final Map<UUID, Double> balances = new HashMap<>();
-    private final Map<UUID, Welfare> welfares = new HashMap<>();
+    private final Map<UUID, RedPack> welfares = new HashMap<>();
 
     public double getBalance(ServerPlayerEntity player) {
         return balances.getOrDefault(player.getUuid(), 0.0);
@@ -33,7 +33,7 @@ public class EconomyManager extends PersistentState {
         nbt.put("Balances", balancesNbt);
 
         NbtCompound welfaresNbt = new NbtCompound();
-        for (Map.Entry<UUID, Welfare> entry : welfares.entrySet()) {
+        for (Map.Entry<UUID, RedPack> entry : welfares.entrySet()) {
             welfaresNbt.put(entry.getKey().toString(), entry.getValue().toNbt());
         }
         nbt.put("Welfares", welfaresNbt);
@@ -51,7 +51,7 @@ public class EconomyManager extends PersistentState {
 
         NbtCompound welfaresNbt = nbt.getCompound("Welfares");
         for (String key : welfaresNbt.getKeys()) {
-            manager.welfares.put(UUID.fromString(key), Welfare.fromNbt(welfaresNbt.getCompound(key)));
+            manager.welfares.put(UUID.fromString(key), RedPack.fromNbt(welfaresNbt.getCompound(key)));
         }
 
         return manager;
@@ -69,20 +69,20 @@ public class EconomyManager extends PersistentState {
         }
 
         UUID welfareId = UUID.randomUUID();
-        Welfare welfare = new Welfare(welfareId, player.getUuid(), totalAmount, count, isLucky);
-        welfares.put(welfareId, welfare);
+        RedPack redPack = new RedPack(welfareId, player.getUuid(), totalAmount, count, isLucky);
+        welfares.put(welfareId, redPack);
         removeBalance(player, totalAmount);
         markDirty();
         return welfareId;
     }
 
     public double claimWelfare(UUID welfareId, ServerPlayerEntity player) {
-        Welfare welfare = welfares.get(welfareId);
-        if (welfare == null || welfare.isClaimedBy(player.getUuid())) {
+        RedPack redPack = welfares.get(welfareId);
+        if (redPack == null || redPack.isClaimedBy(player.getUuid())) {
             return 0.0; // 红包不存在或已被该玩家领取
         }
 
-        double amount = welfare.claim(player.getUuid());
+        double amount = redPack.claim(player.getUuid());
         markDirty();
 
         // 保留两位小数

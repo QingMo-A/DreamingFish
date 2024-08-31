@@ -1,6 +1,7 @@
 package com.mo.moonfish.dreamingfish.command.commands.economy;
 
 import com.mo.moonfish.dreamingfish.economy.EconomyManager;
+import com.mo.moonfish.dreamingfish.economy.message.RedPackMessage;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -15,7 +16,7 @@ import net.minecraft.util.Formatting;
 
 import java.util.UUID;
 
-public class WelfareCommand {
+public class RedPackCommand {
 
     public static void registerCommands() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
@@ -49,7 +50,7 @@ public class WelfareCommand {
 
         if (welfareId != null) {
             // 创建红包成功，向所有在线玩家发送消息
-            sendWelfareAnnouncement(source, player.getName().getString(), welfareId);
+            RedPackMessage.sendWelfareAnnouncement(source, player.getName().getString(), welfareId);
             return 1;
         } else {
             player.sendMessage(Text.translatable("economy.red_packet_creation_failed").formatted(Formatting.RED), false);
@@ -79,20 +80,6 @@ public class WelfareCommand {
         } else {
             player.sendMessage(Text.translatable("economy.claim_failure").formatted(Formatting.RED), false);
             return 0;
-        }
-    }
-
-
-    private static void sendWelfareAnnouncement(ServerCommandSource source, String playerName, UUID welfareId) {
-        MutableText message = Text.translatable("economy.player_sends_red_packet_announcement", playerName, welfareId.toString()).formatted(Formatting.GOLD)
-                .append(" ")
-                .append(Text.translatable("economy.claim").formatted(Formatting.RED).styled(style ->
-                        style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/claim " + welfareId))
-                ));
-
-        // 向所有在线玩家发送消息
-        for (ServerPlayerEntity onlinePlayer : source.getServer().getPlayerManager().getPlayerList()) {
-            onlinePlayer.sendMessage(message, false);
         }
     }
 }

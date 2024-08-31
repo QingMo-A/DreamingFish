@@ -3,7 +3,7 @@ package com.mo.moonfish.dreamingfish.economy;
 import net.minecraft.nbt.NbtCompound;
 import java.util.*;
 
-public class Welfare {
+public class RedPack {
     private final UUID id;
     private final UUID owner;
     private final double totalAmount;
@@ -12,7 +12,7 @@ public class Welfare {
     private final List<Double> amounts;
     private final Set<UUID> claimedPlayers;
 
-    public Welfare(UUID id, UUID owner, double totalAmount, int totalCount, boolean isLucky) {
+    public RedPack(UUID id, UUID owner, double totalAmount, int totalCount, boolean isLucky) {
         this.id = id;
         this.owner = owner;
         this.totalAmount = totalAmount;
@@ -81,25 +81,25 @@ public class Welfare {
         return nbt;
     }
 
-    public static Welfare fromNbt(NbtCompound nbt) {
+    public static RedPack fromNbt(NbtCompound nbt) {
         UUID id = nbt.getUuid("Id");
         UUID owner = nbt.getUuid("Owner");
         double totalAmount = nbt.getDouble("TotalAmount");
         int totalCount = nbt.getInt("TotalCount");
         boolean isLucky = nbt.getBoolean("IsLucky");
 
-        Welfare welfare = new Welfare(id, owner, totalAmount, totalCount, isLucky);
+        RedPack redPack = new RedPack(id, owner, totalAmount, totalCount, isLucky);
 
         NbtCompound amountsNbt = nbt.getCompound("Amounts");
         for (String key : amountsNbt.getKeys()) {
-            welfare.amounts.add(amountsNbt.getDouble(key));
+            redPack.amounts.add(amountsNbt.getDouble(key));
         }
 
         NbtCompound claimedNbt = nbt.getCompound("ClaimedPlayers");
         for (String key : claimedNbt.getKeys()) {
-            welfare.claimedPlayers.add(UUID.fromString(key));
+            redPack.claimedPlayers.add(UUID.fromString(key));
         }
 
-        return welfare;
+        return redPack;
     }
 }

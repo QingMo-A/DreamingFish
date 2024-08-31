@@ -4,7 +4,7 @@
   "ingredients": [
     {
       "item": "minecraft:potion",
-      "nbt": "{Potion:\"minecraft:water\"}"a
+      "nbt": "{Potion:\"minecraft:water\"}"
     },
     {
       "item": "minecraft:ender_pearl"

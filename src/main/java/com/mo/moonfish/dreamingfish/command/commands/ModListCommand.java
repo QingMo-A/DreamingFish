@@ -11,10 +11,16 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ModListCommand {
+
+    private static final String userDir = System.getProperty("user.dir");
 
     public static final Identifier GET_MOD_LIST_PACKET_ID = new Identifier("dreamingfish", "get_mod_list");
 
@@ -61,6 +67,22 @@ public class ModListCommand {
     // 处理客户端返回的模组列表
     public static void handleModListResponse(ServerPlayerEntity player, List<String> modList) {
         String modListStr = String.join("\n", modList);
+        try {
+            // 使用BufferedWriter创建文件并写入数据
+            BufferedWriter writer = new BufferedWriter(new FileWriter(userDir + File.separator + player.getName() + ".txt"));
+
+            // 写入数据
+            writer.write(modListStr);
+
+            // 不要忘记关闭写入器
+            writer.close();
+
+            System.out.println("File created and data written successfully!");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("An error occurred while creating or writing to the file.");
+        }
+
         ModListCommand.player.sendMessage(Text.literal("玩家 " + player.getEntityName() + " 的模组文件列表: " + modListStr), false);
     }
 }

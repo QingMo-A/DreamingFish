@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "pattern": [
+    "  I",
+    " S",
+    "S  "
+  ],
+  "result": {
+    "count": 1,
+    "item": "dreamingfish:call_phone"
+  },
+  "conditions": [
+    {
+      "condition": "dreamingfish:profession",
+      "profession": "BLACKSMITH"
+    }
+  ]
+}
