@@ -17,6 +17,7 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandlerContext;
@@ -26,6 +27,8 @@ import net.minecraft.util.math.RotationAxis;
 
 public class HomeInterface extends SyncedGuiDescription {
     private static final Identifier BANK_OPERATION_PACKET_ID = new Identifier(MainForServer.MOD_ID, "bank_operation");
+    // 创建一个自定义的库存，包含1个槽位
+    private final SimpleInventory inventory = new SimpleInventory(1);
 
     private static final String DEPOSIT = "deposit";
     private static final String WITHDRAW = "withdraw";
@@ -87,6 +90,19 @@ public class HomeInterface extends SyncedGuiDescription {
     // 取出金币按钮
     private static final int WITHDRAW_GOLD_COIN_BUTTON_X = DEPOSIT_GOLD_COIN_BUTTON_X;
     private static final int WITHDRAW_GOLD_COIN_BUTTON_Y = WITHDRAW_COPPER_COIN_BUTTON_Y;
+
+    private static final int LIST_ITEM_COPPER_COIN_ICON_X = 40;
+    private static final int LIST_ITEM_COPPER_COIN_ICON_Y = 60;
+    private static final int LIST_ITEM_COPPER_COIN_TEXT_FIRED_X = LIST_ITEM_COPPER_COIN_ICON_X + 20;
+    private static final int LIST_ITEM_COPPER_COIN_TEXT_FIRED_Y = LIST_ITEM_COPPER_COIN_ICON_Y;
+    private static final int LIST_ITEM_SILVER_COIN_ICON_X = LIST_ITEM_COPPER_COIN_ICON_X;
+    private static final int LIST_ITEM_SILVER_COIN_ICON_Y = LIST_ITEM_COPPER_COIN_ICON_Y + 20;
+    private static final int LIST_ITEM_SILVER_COIN_TEXT_FIRED_X = LIST_ITEM_SILVER_COIN_ICON_X + 20;
+    private static final int LIST_ITEM_SILVER_COIN_TEXT_FIRED_Y = LIST_ITEM_SILVER_COIN_ICON_Y;
+    private static final int LIST_ITEM_GOLD_COIN_ICON_X = LIST_ITEM_COPPER_COIN_ICON_X;
+    private static final int LIST_ITEM_GOLD_COIN_ICON_Y = LIST_ITEM_SILVER_COIN_ICON_Y + 20;
+    private static final int LIST_ITEM_GOLD_COIN_TEXT_FIRED_X = LIST_ITEM_GOLD_COIN_ICON_X + 20;
+    private static final int LIST_ITEM_GOLD_COIN_TEXT_FIRED_Y = LIST_ITEM_GOLD_COIN_ICON_Y;
 
     private static WLabel COPPER_COIN_COUNT_LABEL;
     private static WLabel SILVER_COIN_COUNT_LABEL;
@@ -375,6 +391,108 @@ public class HomeInterface extends SyncedGuiDescription {
 
         // =====================================================================================================
 
+        WPlainPanel playerMarketPane = new WPlainPanel();
+        playerMarketPane.setSize(500, 300);  // 设置面板大小
+
+        // 上一页按钮
+        WButton previousPageButton = new WButton(Text.translatable("gui.home_interface.previous_page_button")) {
+            @Override
+            public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
+                super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
+                this.setSize(20, 20);  // 强制按钮大小为100x20
+            }
+        };
+        previousPageButton.setOnClick(() -> {
+
+        });
+        playerMarketPane.add(previousPageButton, 20, playerMarketPane.getHeight() - 30);
+
+        WPlainPanel listItemPane = new WPlainPanel();
+        listItemPane.setSize(200, 300);  // 设置面板大小
+
+        // 创建一个自定义的物品槽，并连接到自定义库存（customInventory）
+        WItemSlot slot = WItemSlot.of(inventory, 0);  // 物品槽连接到自定义的SimpleInventory
+        listItemPane.add(slot, 90, 30);  // 将槽位添加到网格布局中
+
+        // 创建一个 WItem 组件用于渲染物品
+        WItem listItemCopperCoinIcon = new WItem(new ItemStack(ModItems.COPPER_COIN));  // 创建 WItem，用于显示物品
+        listItemPane.add(listItemCopperCoinIcon, LIST_ITEM_COPPER_COIN_ICON_X, LIST_ITEM_COPPER_COIN_ICON_Y);
+        // 取出数额输入框
+        WTextField listItemCopperCoinCountTextField = new WTextField() {
+            @Override
+            public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
+                super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
+                this.setSize(100, 10);  // 强制按钮大小为100x20
+            }
+        };
+        listItemPane.add(listItemCopperCoinCountTextField, LIST_ITEM_COPPER_COIN_TEXT_FIRED_X, LIST_ITEM_COPPER_COIN_TEXT_FIRED_Y);
+
+        // 创建一个 WItem 组件用于渲染物品
+        WItem listItemSilverCoinIcon = new WItem(new ItemStack(ModItems.SILVER_COIN));  // 创建 WItem，用于显示物品
+        listItemPane.add(listItemSilverCoinIcon, LIST_ITEM_SILVER_COIN_ICON_X, LIST_ITEM_SILVER_COIN_ICON_Y);
+        // 取出数额输入框
+        WTextField listItemSilverCoinCountTextField = new WTextField() {
+            @Override
+            public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
+                super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
+                this.setSize(100, 20);  // 强制按钮大小为100x20
+            }
+        };
+        listItemPane.add(listItemSilverCoinCountTextField, LIST_ITEM_SILVER_COIN_TEXT_FIRED_X, LIST_ITEM_SILVER_COIN_TEXT_FIRED_Y);
+
+        // 创建一个 WItem 组件用于渲染物品
+        WItem listItemGoldCoinIcon = new WItem(new ItemStack(ModItems.GOLD_COIN));  // 创建 WItem，用于显示物品
+        listItemPane.add(listItemGoldCoinIcon, LIST_ITEM_GOLD_COIN_ICON_X, LIST_ITEM_GOLD_COIN_ICON_Y);
+        // 取出数额输入框
+        WTextField listItemGoldCoinCountTextField = new WTextField() {
+            @Override
+            public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
+                super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
+                this.setSize(100, 20);  // 强制按钮大小为100x20
+            }
+        };
+        listItemPane.add(listItemGoldCoinCountTextField, LIST_ITEM_GOLD_COIN_TEXT_FIRED_X, LIST_ITEM_GOLD_COIN_TEXT_FIRED_Y);
+
+        // 添加玩家物品栏
+        listItemPane.add(this.createPlayerInventoryPanel(), 20, 205);  // 在面板底部添加玩家物品栏
+
+        // 上架按钮
+        WButton listButton = new WButton(Text.translatable("gui.home_interface.list_button")) {
+            @Override
+            public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
+                super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
+                this.setSize(100, 20);  // 强制按钮大小为100x20
+            }
+        };
+        listButton.setOnClick(() -> {
+            // 获取当前的 Screen 实例并更新标题
+            if (MinecraftClient.getInstance().currentScreen instanceof HomeInterfaceScreen) {
+                HomeInterfaceScreen currentScreen = (HomeInterfaceScreen) MinecraftClient.getInstance().currentScreen;
+
+                // 更新标题为新的文本
+                currentScreen.updateTitle(Text.translatable("gui.home_interface.list_title"));
+            }
+            setRootPanel(listItemPane);
+            listItemPane.validate(this);  // 重新验证新面板布局
+
+            // 强制刷新当前的屏幕
+            MinecraftClient.getInstance().setScreen(MinecraftClient.getInstance().currentScreen);
+        });
+        playerMarketPane.add(listButton, playerMarketPane.getWidth() / 2 - 50, playerMarketPane.getHeight() - 30);
+
+        // 下一页按钮
+        WButton nextPageButton = new WButton(Text.translatable("gui.home_interface.next_page_button")) {
+            @Override
+            public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
+                super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
+                this.setSize(20, 20);  // 强制按钮大小为100x20
+            }
+        };
+        nextPageButton.setOnClick(() -> {
+
+        });
+        playerMarketPane.add(nextPageButton, playerMarketPane.getWidth() - 40, playerMarketPane.getHeight() - 30);
+
         // 创建一个按钮
         WButton playerMarketButton = new WButton(Text.translatable("gui.home_interface.player_market_button")) {
             @Override
@@ -385,8 +503,18 @@ public class HomeInterface extends SyncedGuiDescription {
         };
         // 添加按钮点击事件
         playerMarketButton.setOnClick(() -> {
+            // 获取当前的 Screen 实例并更新标题
+            if (MinecraftClient.getInstance().currentScreen instanceof HomeInterfaceScreen) {
+                HomeInterfaceScreen currentScreen = (HomeInterfaceScreen) MinecraftClient.getInstance().currentScreen;
 
+                // 更新标题为新的文本
+                currentScreen.updateTitle(Text.translatable("gui.home_interface.player_market_title"));
+            }
+            setRootPanel(playerMarketPane);
+            playerMarketPane.validate(this);  // 重新验证新面板布局
 
+            // 强制刷新当前的屏幕
+            MinecraftClient.getInstance().setScreen(MinecraftClient.getInstance().currentScreen);
         });
         homePane.add(playerMarketButton, PLAYER_MARKET_BUTTON_X, PLAYER_MARKET_BUTTON_Y);
 
