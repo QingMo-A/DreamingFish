@@ -4,11 +4,11 @@ import com.mo.economy.gui.SingleSlotGuiDescription;
 import com.mo.economy.item.ModItemGroups;
 import com.mo.economy.item.ModItems;
 import com.mo.economy.economy_system.EconomyCommand;
-import com.mo.economy.network.client.BalanceResponsePacket;
-import com.mo.economy.network.client.BankLevelResponsePacket;
-import com.mo.economy.network.client.BankOperationPacket;
+import com.mo.economy.network.client.*;
 import com.mo.economy.network.server.RequestBalancePacket;
 import com.mo.economy.network.server.RequestBankLevelPacket;
+import com.mo.economy.network.server.RequestMarketListPacket;
+import com.mo.economy.new_economy_system.ModCommands;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.screen.ScreenHandlerContext;
@@ -41,6 +41,17 @@ public class MainForServer implements ModInitializer {
 		RequestBankLevelPacket.register();
 		// 注册银行等级响应数据包
 		BankLevelResponsePacket.register();
+		// 注册市场列表响应数据包
+		ListItemPacket.register();
+		// 注册请求市场列表数据包
+		RequestMarketListPacket.register();
+		// 注册市场列表响应数据包
+		MarketListResponsePacket.register();
+
+		// 注册指令
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			ModCommands.register(dispatcher);
+		});
 
 		// 注册命令
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {

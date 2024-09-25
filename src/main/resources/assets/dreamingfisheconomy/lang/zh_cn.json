@@ -26,6 +26,7 @@
   "gui.home_interface.previous_page_button": "<-",
   "gui.home_interface.list_button": "上架物品",
   "gui.home_interface.list_title": "上架物品",
+  "gui.home_interface.list_item_button": "上架",
   "gui.home_interface.next_page_button": "->",
   "gui.home_interface.test_label": "测试标签",
   "gui.home_interface.bank_button": "银行",
