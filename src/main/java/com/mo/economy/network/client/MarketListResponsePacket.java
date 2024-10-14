@@ -2,6 +2,7 @@ package com.mo.economy.network.client;
 
 import com.mo.economy.MainForServer;
 import com.mo.economy.gui.home_interface.HomeInterface;
+import com.mo.economy.gui.home_interface.HomeInterfaceManager;
 import com.mo.economy.new_economy_system.player_market.ListedItem;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -23,6 +24,7 @@ public class MarketListResponsePacket {
         ClientPlayNetworking.registerGlobalReceiver(ID, (client, handler, buf, responseSender) -> {
             // 在客户端接收并处理市场列表响应
             int size = buf.readInt();
+            UUID playerUUID1 = client.player.getUuid();
             List<ListedItem> receivedItems = new ArrayList<>();
 
             for (int i = 0; i < size; i++) {
@@ -40,21 +42,22 @@ public class MarketListResponsePacket {
             }
 
             client.execute(() -> {
+                HomeInterface homeInterface = HomeInterfaceManager.getPlayerInterface(playerUUID1);
                 marketItems.clear();
                 marketItems.addAll(receivedItems); // 将收到的商品列表添加到全局列表中
 
                 // 输出接收到的商品列表到控制台
-                System.out.println("Received Market Items:");
+                /*System.out.println("Received Market Items:");
                 for (ListedItem item : marketItems) {
                     System.out.println("Item Name: " + item.getItemName() +
                             " | Copper: " + item.getCopperPrice() +
                             " | Silver: " + item.getSilverPrice() +
                             " | Gold: " + item.getGoldPrice());
-                }
-                HomeInterface.marketItems = marketItems;
-                HomeInterface.totalItems = marketItems.size();
-                HomeInterface.totalPages = Math.max(1, (int) Math.ceil((double) HomeInterface.totalItems / HomeInterface.itemsPerPage));
-                HomeInterface.update(HomeInterface.page);
+                }*/
+                homeInterface.setMarketItems(marketItems);
+                homeInterface.setTotalItems(marketItems.size());
+                homeInterface.setTotalPages(Math.max(1, (int) Math.ceil((double) homeInterface.getTotalItems() / homeInterface.getItemsPerPage())));
+                homeInterface.update(homeInterface.getPage());
             });
         });
     }

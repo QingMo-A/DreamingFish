@@ -2,9 +2,12 @@ package com.mo.economy.network.client;
 
 import com.mo.economy.MainForServer;
 import com.mo.economy.gui.home_interface.HomeInterface;
+import com.mo.economy.gui.home_interface.HomeInterfaceManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
+import java.util.UUID;
 
 public class BalanceResponsePacket {
 
@@ -14,20 +17,16 @@ public class BalanceResponsePacket {
     public static void register() {
         ClientPlayNetworking.registerGlobalReceiver(ID, (client, handler, buf, responseSender) -> {
             int[] balances = buf.readIntArray();  // 读取铜币、银币、金币余额
+            UUID playerUUID = client.player.getUuid();  // 获取当前玩家 UUID
             client.execute(() -> {
-                // 更新客户端的 GUI 或显示余额
-                updateBalanceDisplay(balances);
+                // 通过 UUID 获取玩家对应的 HomeInterface 实例
+                HomeInterface homeInterface = HomeInterfaceManager.getPlayerInterface(playerUUID);
+                System.out.println(homeInterface == null);
+                if (homeInterface != null) {
+                    // 更新 HomeInterface 中的银行数据
+                    homeInterface.updateBalance(balances);
+                }
             });
         });
-    }
-
-    // 更新客户端的余额显示
-    private static void updateBalanceDisplay(int[] balances) {
-        // 这里你可以更新 GUI 中的余额显示
-        System.out.println("铜币余额: " + balances[0]);
-        System.out.println("银币余额: " + balances[1]);
-        System.out.println("金币余额: " + balances[2]);
-
-        HomeInterface.updateMoney(balances);
     }
 }

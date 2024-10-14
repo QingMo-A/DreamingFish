@@ -24,7 +24,7 @@ public class Phone extends Item {
         if (user != null) {
             // 打开自定义 GUI
             user.openHandledScreen(new SimpleNamedScreenHandlerFactory(
-                    (syncId, inv, playerEntity) -> new HomeInterface(syncId, inv, ScreenHandlerContext.EMPTY),
+                    (syncId, inv, playerEntity) ->  new HomeInterface(syncId, inv, ScreenHandlerContext.EMPTY),
                     Text.literal(""))
             );
         }

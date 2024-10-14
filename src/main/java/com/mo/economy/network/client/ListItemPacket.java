@@ -59,6 +59,6 @@ public class ListItemPacket {
         market.listItem(listedItem);
 
         // 通知玩家上架成功
-        player.sendMessage(Text.literal("Item listed successfully!"), false);
+        player.sendMessage(Text.translatable("gui.home_interface.list_item_successful"), false);
     }
 }

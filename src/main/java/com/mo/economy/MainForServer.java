@@ -41,12 +41,14 @@ public class MainForServer implements ModInitializer {
 		RequestBankLevelPacket.register();
 		// 注册银行等级响应数据包
 		BankLevelResponsePacket.register();
-		// 注册市场列表响应数据包
+		// 注册上架商品数据包
 		ListItemPacket.register();
 		// 注册请求市场列表数据包
 		RequestMarketListPacket.register();
 		// 注册市场列表响应数据包
 		MarketListResponsePacket.register();
+		// 注册移除商品数据包
+		RemoveListItemPacket.register();
 
 		// 注册指令
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
