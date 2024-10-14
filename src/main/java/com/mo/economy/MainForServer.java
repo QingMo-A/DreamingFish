@@ -8,6 +8,7 @@ import com.mo.economy.network.client.*;
 import com.mo.economy.network.server.RequestBalancePacket;
 import com.mo.economy.network.server.RequestBankLevelPacket;
 import com.mo.economy.network.server.RequestMarketListPacket;
+import com.mo.economy.network.server.RequestSearchMarketListPacket;
 import com.mo.economy.new_economy_system.ModCommands;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -48,7 +49,9 @@ public class MainForServer implements ModInitializer {
 		// 注册市场列表响应数据包
 		MarketListResponsePacket.register();
 		// 注册移除商品数据包
-		RemoveListItemPacket.register();
+		RemoveListedItemPacket.register();
+		SearchMarketListResponsePacket.register();
+		RequestSearchMarketListPacket.register();
 
 		// 注册指令
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {

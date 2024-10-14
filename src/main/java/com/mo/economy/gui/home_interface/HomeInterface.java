@@ -4,17 +4,16 @@ import com.mo.economy.MainForServer;
 import com.mo.economy.gui.ScreenHandlers;
 import com.mo.economy.item.ModItems;
 import com.mo.economy.network.client.ListItemPacket;
-import com.mo.economy.network.client.MarketListResponsePacket;
-import com.mo.economy.network.client.RemoveListItemPacket;
+import com.mo.economy.network.client.RemoveListedItemPacket;
 import com.mo.economy.network.server.RequestBalancePacket;
 import com.mo.economy.network.server.RequestBankLevelPacket;
 import com.mo.economy.network.server.RequestMarketListPacket;
+import com.mo.economy.network.server.RequestSearchMarketListPacket;
 import com.mo.economy.new_economy_system.bank.AccountLevel;
 import com.mo.economy.new_economy_system.bank.AccountLevels;
 import com.mo.economy.new_economy_system.player_market.ListedItem;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.*;
-import io.github.cottonmc.cotton.gui.widget.data.Axis;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
@@ -23,7 +22,6 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandlerContext;
@@ -33,7 +31,6 @@ import net.minecraft.util.math.RotationAxis;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class HomeInterface extends SyncedGuiDescription {
     private final BankInterface bankInterface = new BankInterface();
@@ -249,8 +246,13 @@ public class HomeInterface extends SyncedGuiDescription {
 
         marketInterface.getSearchButton().setOnClick(() -> {
            if (!(marketInterface.getSearchField().getText().isEmpty())) {
-
+               setPage(1);
+               requestSearchMarketList(marketInterface.getSearchField().getText());
+           } else {
+               setPage(1);
+               requestMarketList();
            }
+           marketInterface.getSearchField().setText("");
         });
 
         marketInterface.getPreviousPageButton().setOnClick(() -> {
@@ -297,6 +299,10 @@ public class HomeInterface extends SyncedGuiDescription {
 
                     page = 1;
                     update(page);
+
+                    marketInterface.getListItemCopperCoinCountTextField().setText("0");
+                    marketInterface.getListItemSilverCoinCountTextField().setText("0");
+                    marketInterface.getListItemGoldCoinCountTextField().setText("0");
                 } else {
                     player.sendMessage(Text.translatable("gui.home_interface.list_item.unauthorized_price"));
                 }
@@ -574,6 +580,12 @@ public class HomeInterface extends SyncedGuiDescription {
         ClientPlayNetworking.send(RequestMarketListPacket.ID, PacketByteBufs.create());
     }
 
+    public static void requestSearchMarketList(String itemName) {
+        System.out.println("1111111111111111111111111");
+        // 向服务器发送请求市场列表的数据包
+        RequestSearchMarketListPacket.sendSearchMarketListPacket(itemName);
+    }
+
     public void update(int page) {
         int startIndex = (page - 1) * itemsPerPage;  // 计算当前页的起始索引
         int endIndex = Math.min(startIndex + itemsPerPage, marketItems.size());  // 计算当前页的结束索引
@@ -619,7 +631,7 @@ public class HomeInterface extends SyncedGuiDescription {
                             // 重置页面
                             setPage(1);
                             // 发送移除商品数据包
-                            RemoveListItemPacket.sendListItemPacket(itemUUID);
+                            RemoveListedItemPacket.sendRemoveListedItemPacket(itemUUID);
                             // 获取市场物品列表
                             requestMarketList();
                             // 添加购买的商品到玩家物品栏

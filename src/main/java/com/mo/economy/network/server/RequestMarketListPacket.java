@@ -14,7 +14,6 @@ import net.minecraft.util.Identifier;
 import java.util.List;
 
 public class RequestMarketListPacket {
-
     public static final Identifier ID = new Identifier(MainForServer.MOD_ID, "request_market_list");
 
     public static void register() {

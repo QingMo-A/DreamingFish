@@ -11,11 +11,11 @@ import net.minecraft.util.Identifier;
 
 import java.util.UUID;
 
-public class RemoveListItemPacket {
+public class RemoveListedItemPacket {
     public static final Identifier ID = new Identifier(MainForServer.MOD_ID, "remove_list_item");
 
     // 在客户端发送数据包的方法
-    public static void sendListItemPacket(UUID itemId) {
+    public static void sendRemoveListedItemPacket(UUID itemId) {
         PacketByteBuf buf = PacketByteBufs.create();
 
         // 序列化数据
@@ -30,11 +30,11 @@ public class RemoveListItemPacket {
             UUID itemId = buf.readUuid();
 
             // 在服务端执行商品上架操作
-            server.execute(() -> handleRemoveListItem(player, itemId));
+            server.execute(() -> handleRemoveListedItem(player, itemId));
         });
     }
 
-    private static void handleRemoveListItem(ServerPlayerEntity player, UUID itemId) {
+    private static void handleRemoveListedItem(ServerPlayerEntity player, UUID itemId) {
         // 将商品添加到市场系统
         Market market = Market.getInstance(player.getServer()); // 获取市场实例
         market.removeItemById(itemId);
