@@ -10,8 +10,9 @@ import net.minecraft.util.Identifier;
 public class ScreenHandlers {
 
     public static final Identifier SINGLE_SLOT_SCREEN_ID = new Identifier(MainForServer.MOD_ID, "single_slot");
-    public static ScreenHandlerType<SingleSlotGuiDescription> SINGLE_SLOT_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(SINGLE_SLOT_SCREEN_ID, (syncId, inv) ->
-            new SingleSlotGuiDescription(syncId, inv, ScreenHandlerContext.EMPTY));
+    public static ScreenHandlerType<SingleSlotGuiDescription> SINGLE_SLOT_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(
+            SINGLE_SLOT_SCREEN_ID,
+            (syncId, inv) -> new SingleSlotGuiDescription(syncId, inv, ScreenHandlerContext.EMPTY));
 
     public static final Identifier HOME_INTERFACE_SCREEN_ID = new Identifier(MainForServer.MOD_ID, "home_interface");
     public static ScreenHandlerType<HomeInterface> HOME_INTERFACE_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(

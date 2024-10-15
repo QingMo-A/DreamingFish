@@ -28,4 +28,6 @@ public class SingleSlotGuiDescription extends SyncedGuiDescription {
 
         root.validate(this);
     }
+
+
 }

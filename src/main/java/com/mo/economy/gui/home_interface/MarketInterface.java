@@ -1,14 +1,17 @@
 package com.mo.economy.gui.home_interface;
 
+import com.mo.economy.gui.ScreenHandlers;
 import com.mo.economy.item.ModItems;
 import io.github.cottonmc.cotton.gui.widget.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 
-public class MarketInterface {
+public class MarketInterface extends ScreenHandler {
     // 创建一个一格的物品栏
     private final SimpleInventory inventory = new SimpleInventory(1);
     // 创建一个九格的物品栏
@@ -195,7 +198,8 @@ public class MarketInterface {
     private static final int ITEM_PANE_9_Y = ITEM_PANE_8_Y + 25;
 
 
-    public MarketInterface() {
+    public MarketInterface(int syncId) {
+        super(ScreenHandlers.HOME_INTERFACE_SCREEN_HANDLER, syncId);
         playerMarketPane = new WPlainPanel();
         playerMarketPane.setSize(500, 300);  // 设置面板大小
 
@@ -208,7 +212,7 @@ public class MarketInterface {
         };
         playerMarketPane.add(searchField, SEARCH_FIELD_X, SEARCH_FIELD_Y);
 
-        searchButton = new WButton(Text.literal("Search")) {
+        searchButton = new WButton(Text.translatable("gui.home_interface.search_button")) {
             @Override
             public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
                 super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
@@ -241,7 +245,7 @@ public class MarketInterface {
         itemPane1.add(SELLER_LABEL_1,  280, 7);  // 将sellerLabel放置在(140, 0)位置
 
         // 添加一个"购买"按钮
-        BUY_BUTTON_1 = new WButton(Text.literal("Buy")) {
+        BUY_BUTTON_1 = new WButton(Text.translatable("gui.home_interface.buy_button")) {
             @Override
             public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
                 super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
@@ -278,7 +282,7 @@ public class MarketInterface {
         itemPane2.add(SELLER_LABEL_2,  280, 7);  // 将sellerLabel放置在(140, 0)位置
 
         // 添加一个"购买"按钮
-        BUY_BUTTON_2 = new WButton(Text.literal("Buy")) {
+        BUY_BUTTON_2 = new WButton(Text.translatable("gui.home_interface.buy_button")) {
             @Override
             public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
                 super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
@@ -315,7 +319,7 @@ public class MarketInterface {
         itemPane3.add(SELLER_LABEL_3,  280, 7);  // 将sellerLabel放置在(140, 0)位置
 
         // 添加一个"购买"按钮
-        BUY_BUTTON_3 = new WButton(Text.literal("Buy")) {
+        BUY_BUTTON_3 = new WButton(Text.translatable("gui.home_interface.buy_button")) {
             @Override
             public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
                 super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
@@ -352,7 +356,7 @@ public class MarketInterface {
         itemPane4.add(SELLER_LABEL_4,  280, 7);  // 将sellerLabel放置在(140, 0)位置
 
         // 添加一个"购买"按钮
-        BUY_BUTTON_4 = new WButton(Text.literal("Buy")) {
+        BUY_BUTTON_4 = new WButton(Text.translatable("gui.home_interface.buy_button")) {
             @Override
             public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
                 super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
@@ -389,7 +393,7 @@ public class MarketInterface {
         itemPane5.add(SELLER_LABEL_5,  280, 7);  // 将sellerLabel放置在(140, 0)位置
 
         // 添加一个"购买"按钮
-        BUY_BUTTON_5 = new WButton(Text.literal("Buy")) {
+        BUY_BUTTON_5 = new WButton(Text.translatable("gui.home_interface.buy_button")) {
             @Override
             public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
                 super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
@@ -426,7 +430,7 @@ public class MarketInterface {
         itemPane6.add(SELLER_LABEL_6,  280, 7);  // 将sellerLabel放置在(140, 0)位置
 
         // 添加一个"购买"按钮
-        BUY_BUTTON_6 = new WButton(Text.literal("Buy")) {
+        BUY_BUTTON_6 = new WButton(Text.translatable("gui.home_interface.buy_button")) {
             @Override
             public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
                 super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
@@ -463,7 +467,7 @@ public class MarketInterface {
         itemPane7.add(SELLER_LABEL_7,  280, 7);  // 将sellerLabel放置在(140, 0)位置
 
         // 添加一个"购买"按钮
-        BUY_BUTTON_7 = new WButton(Text.literal("Buy")) {
+        BUY_BUTTON_7 = new WButton(Text.translatable("gui.home_interface.buy_button")) {
             @Override
             public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
                 super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
@@ -500,7 +504,7 @@ public class MarketInterface {
         itemPane8.add(SELLER_LABEL_8,  280, 7);  // 将sellerLabel放置在(140, 0)位置
 
         // 添加一个"购买"按钮
-        BUY_BUTTON_8 = new WButton(Text.literal("Buy")) {
+        BUY_BUTTON_8 = new WButton(Text.translatable("gui.home_interface.buy_button")) {
             @Override
             public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
                 super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
@@ -535,7 +539,7 @@ public class MarketInterface {
         itemPane9.add(SELLER_LABEL_9,  280, 7);  // 将sellerLabel放置在(140, 0)位置
 
         // 添加一个"购买"按钮
-        BUY_BUTTON_9 = new WButton(Text.literal("Buy")) {
+        BUY_BUTTON_9 = new WButton(Text.translatable("gui.home_interface.buy_button")) {
             @Override
             public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
                 super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
@@ -1165,5 +1169,22 @@ public class MarketInterface {
 
     public void setSearchButton(WButton searchButton) {
         this.searchButton = searchButton;
+    }
+
+    @Override
+    public ItemStack quickMove(PlayerEntity player, int slot) {
+        return null;
+    }
+
+    @Override
+    public boolean canUse(PlayerEntity player) {
+        return false;
+    }
+
+    @Override
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
+        // 关闭界面时，处理物品的返还
+        dropInventory(player, this.inventory);
     }
 }

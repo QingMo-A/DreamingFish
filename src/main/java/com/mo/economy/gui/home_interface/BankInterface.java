@@ -12,7 +12,7 @@ public class BankInterface {
     // 银行等级标签
     private WLabel bankLevelLabel;
     // 银行等级标签的X坐标
-    private final int BACK_LEVEL_LABEL_X = 130;
+    private final int BACK_LEVEL_LABEL_X = 150;
     // 银行等级标签的Y坐标
     private final int BACK_LEVEL_LABEL_Y = 40;
     // 铜币图标

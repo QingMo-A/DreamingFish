@@ -22,7 +22,9 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.text.Text;
@@ -34,12 +36,17 @@ import java.util.UUID;
 
 public class HomeInterface extends SyncedGuiDescription {
     private final BankInterface bankInterface = new BankInterface();
-    private final MarketInterface marketInterface = new MarketInterface();
+    private MarketInterface marketInterface;
 
     private PlayerEntity player;
     private PlayerInventory playerInventory;
 
     private static final Identifier BANK_OPERATION_PACKET_ID = new Identifier(MainForServer.MOD_ID, "bank_operation");
+
+    private WButton bankButton;
+    private WButton officialStoreButton;
+    private WButton playerMarketButton;
+    private WButton myListedItemButton;
 
     private static final int BANK_ICON_X = 170;
     private static final int BANK_ICON_Y = 60;
@@ -56,6 +63,11 @@ public class HomeInterface extends SyncedGuiDescription {
     private static final int PLAYER_MARKET_BUTTON_X = BANK_BUTTON_X;
     private static final int PLAYER_MARKET_BUTTON_Y = PLAYER_MARKET_ICON_Y;
 
+    private static final int MY_LISTED_ITEM_ICON_X = BANK_ICON_X;
+    private static final int MY_LISTED_ITEM_ICON_Y = PLAYER_MARKET_ICON_Y + 30;
+    private static final int MY_LISTED_ITEM_BUTTON_X = BANK_BUTTON_X;
+    private static final int MY_LISTED_ITEM_BUTTON_Y = MY_LISTED_ITEM_ICON_Y;
+
     private AccountLevel accountLevel;
 
     private final int itemsPerPage = 9;  // 每页显示的商品数量
@@ -68,6 +80,7 @@ public class HomeInterface extends SyncedGuiDescription {
     public HomeInterface(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
         super(ScreenHandlers.HOME_INTERFACE_SCREEN_HANDLER, syncId, playerInventory);
         HomeInterfaceManager.setPlayerInterface(playerInventory.player.getUuid(), this);
+        marketInterface = new MarketInterface(syncId);
 
         // 通过 playerInventory 获取当前打开 GUI 的玩家实例
         setPlayerInventory(playerInventory);
@@ -76,6 +89,9 @@ public class HomeInterface extends SyncedGuiDescription {
         WPlainPanel homePane = new WPlainPanel();
         setRootPanel(homePane);
         homePane.setSize(500, 300);  // 设置面板大小
+
+        // 解决Bug超级重要代码 删了上架页面就有Bug
+        WItemSlot slot = WItemSlot.of(new SimpleInventory(1), 0);
 
         // 创建一个标签
         WLabel label = new WLabel(Text.translatable("gui.home_interface.test_label"));
@@ -87,7 +103,7 @@ public class HomeInterface extends SyncedGuiDescription {
         requestBankLevel(); // 请求银行等级
 
         // 创建银行按钮
-        WButton bankButton = new WButton(Text.translatable("gui.home_interface.bank_button")) {
+        bankButton = new WButton(Text.translatable("gui.home_interface.bank_button")) {
             @Override
             public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
                 super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
@@ -224,7 +240,7 @@ public class HomeInterface extends SyncedGuiDescription {
         // =====================================================================================================
 
         // 创建一个按钮
-        WButton officialStoreButton = new WButton(Text.translatable("gui.home_interface.official_store_button")) {
+        officialStoreButton = new WButton(Text.translatable("gui.home_interface.official_store_button")) {
             @Override
             public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
                 super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
@@ -268,41 +284,65 @@ public class HomeInterface extends SyncedGuiDescription {
                     !(marketInterface.getInventory().getStack(0).isOf(ModItems.GOLD_COIN))
             )
             {
+                String copperText = marketInterface.getListItemCopperCoinCountTextField().getText();
+                String silverText = marketInterface.getListItemSilverCoinCountTextField().getText();
+                String goldText = marketInterface.getListItemGoldCoinCountTextField().getText();
                 if (
-                        !(marketInterface.getListItemCopperCoinCountTextField().getText().isEmpty()) && Integer.parseInt(marketInterface.getListItemCopperCoinCountTextField().getText()) > 0 &&
-                        !(marketInterface.getListItemSilverCoinCountTextField().getText().isEmpty()) && Integer.parseInt(marketInterface.getListItemSilverCoinCountTextField().getText()) >= 0 &&
-                        !(marketInterface.getListItemGoldCoinCountTextField().getText().isEmpty()) && Integer.parseInt(marketInterface.getListItemGoldCoinCountTextField().getText()) >= 0
+                        // 确保所有输入框都不为空
+                        !copperText.isEmpty() && !silverText.isEmpty() && !goldText.isEmpty() &&
+
+                        // 至少一个大于0
+                        (Integer.parseInt(copperText) > 0 || Integer.parseInt(silverText) > 0 || Integer.parseInt(goldText) > 0) &&
+
+                        // 其他两个都 >= 0
+                        Integer.parseInt(copperText) >= 0 && Integer.parseInt(silverText) >= 0 && Integer.parseInt(goldText) >= 0
                 )
                 {
                     int copperCoinCount = Integer.parseInt(marketInterface.getListItemCopperCoinCountTextField().getText());
                     int silverCoinCount = Integer.parseInt(marketInterface.getListItemSilverCoinCountTextField().getText());
                     int goldCoinCount = Integer.parseInt(marketInterface.getListItemGoldCoinCountTextField().getText());
-                    ItemStack itemToList = marketInterface.getInventory().getStack(0);
-                    marketInterface.getInventory().setStack(0, ItemStack.EMPTY);
 
-                    // 发送上架商品的数据包
-                    ListItemPacket.sendListItemPacket(UUID.randomUUID(),player.getName().getString(), player.getUuid(), copperCoinCount, silverCoinCount, goldCoinCount, itemToList);
-                    // 获取当前的 Screen 实例并更新标题
-                    if (MinecraftClient.getInstance().currentScreen instanceof HomeInterfaceScreen) {
-                        HomeInterfaceScreen currentScreen = (HomeInterfaceScreen) MinecraftClient.getInstance().currentScreen;
+                    int copperCoinTax = copperCoinCount / 5;
+                    int silverCoinTax = silverCoinCount / 5;
+                    int goldCoinTax = goldCoinCount / 5;
 
-                        // 更新标题为新的文本
-                        currentScreen.updateTitle(Text.translatable("gui.home_interface.player_market_title"));
+                    if (
+                            hasEnoughItems(playerInventory, new ItemStack(ModItems.COPPER_COIN), copperCoinTax) &&
+                                    hasEnoughItems(playerInventory, new ItemStack(ModItems.SILVER_COIN), silverCoinTax) &&
+                                    hasEnoughItems(playerInventory, new ItemStack(ModItems.GOLD_COIN), goldCoinTax)
+                    ) {
+                        ItemStack itemToList = marketInterface.getInventory().getStack(0);
+                        marketInterface.getInventory().setStack(0, ItemStack.EMPTY);
+
+                        // 发送上架商品的数据包
+                        ListItemPacket.sendListItemPacket(UUID.randomUUID(),player.getName().getString(), player.getUuid(), copperCoinCount, silverCoinCount, goldCoinCount, itemToList);
+                        removeItemsFromPlayerInventory(playerInventory, new ItemStack(ModItems.COPPER_COIN), copperCoinTax);
+                        removeItemsFromPlayerInventory(playerInventory, new ItemStack(ModItems.SILVER_COIN), silverCoinTax);
+                        removeItemsFromPlayerInventory(playerInventory, new ItemStack(ModItems.GOLD_COIN), goldCoinTax);
+                        // 获取当前的 Screen 实例并更新标题
+                        if (MinecraftClient.getInstance().currentScreen instanceof HomeInterfaceScreen) {
+                            HomeInterfaceScreen currentScreen = (HomeInterfaceScreen) MinecraftClient.getInstance().currentScreen;
+
+                            // 更新标题为新的文本
+                            currentScreen.updateTitle(Text.translatable("gui.home_interface.player_market_title"));
+                        }
+                        setRootPanel(marketInterface.getPlayerMarketPane());
+                        marketInterface.getPlayerMarketPane().validate(this);  // 重新验证新面板布局
+
+                        // 强制刷新当前的屏幕
+                        MinecraftClient.getInstance().setScreen(MinecraftClient.getInstance().currentScreen);
+
+                        requestMarketList();
+
+                        page = 1;
+                        update(page);
+
+                        marketInterface.getListItemCopperCoinCountTextField().setText("0");
+                        marketInterface.getListItemSilverCoinCountTextField().setText("0");
+                        marketInterface.getListItemGoldCoinCountTextField().setText("0");
+                    } else {
+                        player.sendMessage(Text.translatable("gui.home_interface.list_item_tax_payment_failed"));
                     }
-                    setRootPanel(marketInterface.getPlayerMarketPane());
-                    marketInterface.getPlayerMarketPane().validate(this);  // 重新验证新面板布局
-
-                    // 强制刷新当前的屏幕
-                    MinecraftClient.getInstance().setScreen(MinecraftClient.getInstance().currentScreen);
-
-                    requestMarketList();
-
-                    page = 1;
-                    update(page);
-
-                    marketInterface.getListItemCopperCoinCountTextField().setText("0");
-                    marketInterface.getListItemSilverCoinCountTextField().setText("0");
-                    marketInterface.getListItemGoldCoinCountTextField().setText("0");
                 } else {
                     player.sendMessage(Text.translatable("gui.home_interface.list_item.unauthorized_price"));
                 }
@@ -337,7 +377,7 @@ public class HomeInterface extends SyncedGuiDescription {
         });
 
         // 创建一个按钮
-        WButton playerMarketButton = new WButton(Text.translatable("gui.home_interface.player_market_button")) {
+        playerMarketButton = new WButton(Text.translatable("gui.home_interface.player_market_button")) {
             @Override
             public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
                 super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
@@ -365,6 +405,25 @@ public class HomeInterface extends SyncedGuiDescription {
         // 创建一个 WItem 组件用于渲染物品
         WItem playerMarketIcon = new WItem(new ItemStack(ModItems.PLAYER_MARKET_ICON));  // 创建 WItem，用于显示物品
         homePane.add(playerMarketIcon, PLAYER_MARKET_ICON_X, PLAYER_MARKET_ICON_Y);
+
+
+
+        myListedItemButton = new WButton(Text.translatable("gui.home_interface.my_listed_item_button")) {
+            @Override
+            public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
+                super.paint(context, x, y, mouseX, mouseY);  // 确保调用父类的绘制方法
+                this.setSize(100, 20);  // 强制按钮大小为100x20
+            }
+        };
+        myListedItemButton.setOnClick(() -> {
+
+        });
+        homePane.add(myListedItemButton, MY_LISTED_ITEM_BUTTON_X, MY_LISTED_ITEM_BUTTON_Y);
+
+        // 创建一个 WItem 组件用于渲染物品
+        WItem myListedItemIcon = new WItem(new ItemStack(Items.CHEST_MINECART));  // 创建 WItem，用于显示物品
+        homePane.add(myListedItemIcon, MY_LISTED_ITEM_ICON_X, MY_LISTED_ITEM_ICON_Y);
+
 
 
         /*// 添加一个用于渲染玩家模型的组件
@@ -575,13 +634,11 @@ public class HomeInterface extends SyncedGuiDescription {
     }
 
     public static void requestMarketList() {
-        System.out.println("1111111111111111111111111");
         // 向服务器发送请求市场列表的数据包
         ClientPlayNetworking.send(RequestMarketListPacket.ID, PacketByteBufs.create());
     }
 
     public static void requestSearchMarketList(String itemName) {
-        System.out.println("1111111111111111111111111");
         // 向服务器发送请求市场列表的数据包
         RequestSearchMarketListPacket.sendSearchMarketListPacket(itemName);
     }
@@ -598,25 +655,26 @@ public class HomeInterface extends SyncedGuiDescription {
                 ListedItem item = marketItems.get(itemIndex);
                 // 获取商品ID
                 UUID itemUUID = item.getItemId();
+                // 铜币价格
+                int priceCopper = item.getCopperPrice();
+                // 银币价格
+                int priceSilver = item.getSilverPrice();
+                // 金币价格
+                int priceGold = item.getGoldPrice();
                 // 为槽位设置物品
                 marketInterface.getShow_inventory().setStack(i, item.getItemStack());
 
                 // 更新价格标签
-                marketInterface.getPRICE_LABELS()[i].setText(Text.literal("Copper: " + item.getCopperPrice() +
+                /*marketInterface.getPRICE_LABELS()[i].setText(Text.literal("Copper: " + item.getCopperPrice() +
                         " | Silver: " + item.getSilverPrice() +
-                        " | Gold: " + item.getGoldPrice()));
+                        " | Gold: " + item.getGoldPrice()));*/
+                marketInterface.getPRICE_LABELS()[i].setText(Text.translatable("gui.home_interface.item_price", priceCopper, priceSilver, priceGold));
                 // 更新卖家标签
                 marketInterface.getSELLER_LABELS()[i].setText(Text.literal(item.getPlayerName()));
 
                 // 更新按钮功能
                 marketInterface.getBUY_BUTTONS()[i].setOnClick(() -> {
                     System.out.println("Button Clicked!!");
-                    // 铜币价格
-                    int priceCopper = item.getCopperPrice();
-                    // 银币价格
-                    int priceSilver = item.getSilverPrice();
-                    // 金币价格
-                    int priceGold = item.getGoldPrice();
                     System.out.println(priceCopper + " | " + priceSilver + " | " + priceGold);
                     // 检查玩家是否有足够的钱
                     if (
