@@ -4,11 +4,8 @@ import com.mo.economy.MainForServer;
 import com.mo.economy.gui.home_interface.HomeInterface;
 import com.mo.economy.gui.home_interface.HomeInterfaceManager;
 import com.mo.economy.new_economy_system.player_market.ListedItem;
-import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
@@ -57,7 +54,7 @@ public class MarketListResponsePacket {
                 homeInterface.setMarketItems(marketItems);
                 homeInterface.setTotalItems(marketItems.size());
                 homeInterface.setTotalPages(Math.max(1, (int) Math.ceil((double) homeInterface.getTotalItems() / homeInterface.getItemsPerPage())));
-                homeInterface.update(homeInterface.getPage());
+                homeInterface.updateMarketHome(homeInterface.getPage());
             });
         });
     }

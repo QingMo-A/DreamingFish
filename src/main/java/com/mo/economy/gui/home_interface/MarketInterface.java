@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 
-public class MarketInterface extends ScreenHandler {
+public class MarketInterface {
     // 创建一个一格的物品栏
     private final SimpleInventory inventory = new SimpleInventory(1);
     // 创建一个九格的物品栏
@@ -198,8 +198,7 @@ public class MarketInterface extends ScreenHandler {
     private static final int ITEM_PANE_9_Y = ITEM_PANE_8_Y + 25;
 
 
-    public MarketInterface(int syncId) {
-        super(ScreenHandlers.HOME_INTERFACE_SCREEN_HANDLER, syncId);
+    public MarketInterface() {
         playerMarketPane = new WPlainPanel();
         playerMarketPane.setSize(500, 300);  // 设置面板大小
 
@@ -1169,22 +1168,5 @@ public class MarketInterface extends ScreenHandler {
 
     public void setSearchButton(WButton searchButton) {
         this.searchButton = searchButton;
-    }
-
-    @Override
-    public ItemStack quickMove(PlayerEntity player, int slot) {
-        return null;
-    }
-
-    @Override
-    public boolean canUse(PlayerEntity player) {
-        return false;
-    }
-
-    @Override
-    public void onClosed(PlayerEntity player) {
-        super.onClosed(player);
-        // 关闭界面时，处理物品的返还
-        dropInventory(player, this.inventory);
     }
 }

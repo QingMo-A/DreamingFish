@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class SearchMarketListResponsePacket {
-    public static final Identifier ID = new Identifier(MainForServer.MOD_ID, "search_market_list_response");
+public class SearchByPlayerMarketListResponsePacket {
+    public static final Identifier ID = new Identifier(MainForServer.MOD_ID, "search_by_player_market_list_response");
     public static List<ListedItem> marketItems = new ArrayList<>();
 
     public static void register() {
@@ -56,15 +56,15 @@ public class SearchMarketListResponsePacket {
                     homeInterface.setMarketItems(marketItems);
                     homeInterface.setTotalItems(marketItems.size());
                     homeInterface.setTotalPages(Math.max(1, (int) Math.ceil((double) homeInterface.getTotalItems() / homeInterface.getItemsPerPage())));
-                    homeInterface.updateMarketHome(homeInterface.getPage());
+                    homeInterface.updateMarketSearchingPage(homeInterface.getPage());
                 });
             } else {
                 System.out.println("No Searching!!!");
                 marketItems.clear();
-                homeInterface.setMarketItems(marketItems);
+                homeInterface.setMarketItemsBySearching(marketItems);
                 homeInterface.setTotalItems(0);
                 homeInterface.setTotalPages(Math.max(1, (int) Math.ceil((double) homeInterface.getTotalItems() / homeInterface.getItemsPerPage())));
-                homeInterface.updateMarketHome(homeInterface.getPage());
+                homeInterface.updateMarketSearchingPage(homeInterface.getPage());
             }
         });
     }

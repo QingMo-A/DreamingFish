@@ -5,10 +5,7 @@ import com.mo.economy.gui.ScreenHandlers;
 import com.mo.economy.item.ModItems;
 import com.mo.economy.network.client.ListItemPacket;
 import com.mo.economy.network.client.RemoveListedItemPacket;
-import com.mo.economy.network.server.RequestBalancePacket;
-import com.mo.economy.network.server.RequestBankLevelPacket;
-import com.mo.economy.network.server.RequestMarketListPacket;
-import com.mo.economy.network.server.RequestSearchMarketListPacket;
+import com.mo.economy.network.server.*;
 import com.mo.economy.new_economy_system.bank.AccountLevel;
 import com.mo.economy.new_economy_system.bank.AccountLevels;
 import com.mo.economy.new_economy_system.player_market.ListedItem;
@@ -22,7 +19,6 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
@@ -36,7 +32,8 @@ import java.util.UUID;
 
 public class HomeInterface extends SyncedGuiDescription {
     private final BankInterface bankInterface = new BankInterface();
-    private MarketInterface marketInterface;
+    private final MarketInterface marketInterface = new MarketInterface();
+    private final ListedItemInterface listedItemInterface = new ListedItemInterface();
 
     private PlayerEntity player;
     private PlayerInventory playerInventory;
@@ -48,7 +45,8 @@ public class HomeInterface extends SyncedGuiDescription {
     private WButton playerMarketButton;
     private WButton myListedItemButton;
 
-    private static final int BANK_ICON_X = 170;
+    // 170
+    private static final int BANK_ICON_X = 130;
     private static final int BANK_ICON_Y = 60;
     private static final int BANK_BUTTON_X = BANK_ICON_X + 30;
     private static final int BANK_BUTTON_Y = BANK_ICON_Y;
@@ -76,11 +74,12 @@ public class HomeInterface extends SyncedGuiDescription {
     private int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / itemsPerPage));
 
     private List<ListedItem> marketItems;
+    private List<ListedItem> marketItemsBySearching;
 
     public HomeInterface(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
         super(ScreenHandlers.HOME_INTERFACE_SCREEN_HANDLER, syncId, playerInventory);
         HomeInterfaceManager.setPlayerInterface(playerInventory.player.getUuid(), this);
-        marketInterface = new MarketInterface(syncId);
+
 
         // 通过 playerInventory 获取当前打开 GUI 的玩家实例
         setPlayerInventory(playerInventory);
@@ -88,10 +87,7 @@ public class HomeInterface extends SyncedGuiDescription {
 
         WPlainPanel homePane = new WPlainPanel();
         setRootPanel(homePane);
-        homePane.setSize(500, 300);  // 设置面板大小
-
-        // 解决Bug超级重要代码 删了上架页面就有Bug
-        WItemSlot slot = WItemSlot.of(new SimpleInventory(1), 0);
+        homePane.setSize(500, 300);  // 设置面板
 
         // 创建一个标签
         WLabel label = new WLabel(Text.translatable("gui.home_interface.test_label"));
@@ -335,7 +331,7 @@ public class HomeInterface extends SyncedGuiDescription {
                         requestMarketList();
 
                         page = 1;
-                        update(page);
+                        updateMarketHome(page);
 
                         marketInterface.getListItemCopperCoinCountTextField().setText("0");
                         marketInterface.getListItemSilverCoinCountTextField().setText("0");
@@ -416,7 +412,19 @@ public class HomeInterface extends SyncedGuiDescription {
             }
         };
         myListedItemButton.setOnClick(() -> {
+            requestSearchMarketList(player.getUuid());
+            // 获取当前的 Screen 实例并更新标题
+            if (MinecraftClient.getInstance().currentScreen instanceof HomeInterfaceScreen) {
+                HomeInterfaceScreen currentScreen = (HomeInterfaceScreen) MinecraftClient.getInstance().currentScreen;
 
+                // 更新标题为新的文本
+                currentScreen.updateTitle(Text.translatable("gui.home_interface.listed_items_title"));
+            }
+            setRootPanel(listedItemInterface.getListedItemPane());
+            listedItemInterface.getListedItemPane().validate(this);  // 重新验证新面板布局
+
+            // 强制刷新当前的屏幕
+            MinecraftClient.getInstance().setScreen(MinecraftClient.getInstance().currentScreen);
         });
         homePane.add(myListedItemButton, MY_LISTED_ITEM_BUTTON_X, MY_LISTED_ITEM_BUTTON_Y);
 
@@ -643,7 +651,12 @@ public class HomeInterface extends SyncedGuiDescription {
         RequestSearchMarketListPacket.sendSearchMarketListPacket(itemName);
     }
 
-    public void update(int page) {
+    public static void requestSearchMarketList(UUID playerUUID) {
+        // 向服务器发送请求市场列表的数据包
+        RequestSearchByPlayerMarketListPacket.sendSearchMarketListPacket(playerUUID);
+    }
+
+    public void updateMarketHome(int page) {
         int startIndex = (page - 1) * itemsPerPage;  // 计算当前页的起始索引
         int endIndex = Math.min(startIndex + itemsPerPage, marketItems.size());  // 计算当前页的结束索引
 
@@ -703,12 +716,73 @@ public class HomeInterface extends SyncedGuiDescription {
                         }
                     }
                 });
+                System.out.println("Update Button Action!!!");
             } else {
                 // 如果没有足够的物品，清空对应槽位和标签
                 marketInterface.getShow_inventory().setStack(i, ItemStack.EMPTY);
                 marketInterface.getPRICE_LABELS()[i].setText(Text.literal("null"));
                 marketInterface.getSELLER_LABELS()[i].setText(Text.literal("null"));
-                marketInterface.getBUY_BUTTONS()[i].setOnClick(() -> {});
+                marketInterface.getBUY_BUTTONS()[i].setOnClick(() -> {System.out.println("1");});
+            }
+        }
+    }
+
+    public void updateMarketSearchingPage(int page) {
+        int startIndex = (page - 1) * itemsPerPage;  // 计算当前页的起始索引
+        int endIndex = Math.min(startIndex + itemsPerPage, marketItemsBySearching.size());  // 计算当前页的结束索引
+
+        for (int i = 0; i < itemsPerPage; i++) {
+            int itemIndex = startIndex + i;
+
+            if (itemIndex < marketItemsBySearching.size()) {
+                // 获取当前页的物品，并更新对应槽位和标签
+                ListedItem item = marketItemsBySearching.get(itemIndex);
+                // 获取商品ID
+                UUID itemUUID = item.getItemId();
+                // 铜币价格
+                int priceCopper = item.getCopperPrice();
+                // 银币价格
+                int priceSilver = item.getSilverPrice();
+                // 金币价格
+                int priceGold = item.getGoldPrice();
+                // 为槽位设置物品
+                listedItemInterface.getShow_inventory().setStack(i, item.getItemStack());
+
+                // 更新价格标签
+                /*marketInterface.getPRICE_LABELS()[i].setText(Text.literal("Copper: " + item.getCopperPrice() +
+                        " | Silver: " + item.getSilverPrice() +
+                        " | Gold: " + item.getGoldPrice()));*/
+                listedItemInterface.getPRICE_LABELS()[i].setText(Text.translatable("gui.home_interface.item_price", priceCopper, priceSilver, priceGold));
+                // 更新卖家标签
+                listedItemInterface.getSELLER_LABELS()[i].setText(Text.literal(item.getPlayerName()));
+
+                // 更新按钮功能
+                listedItemInterface.getDISCONTINUED_BUTTONS()[i].setOnClick(() -> {
+                    System.out.println("Button Clicked!!");
+                    System.out.println(priceCopper + " | " + priceSilver + " | " + priceGold);
+                    // 检查玩家背包是否有空位
+                    if (hasEnoughSpace(getPlayerInventory(), item.getItemStack(), item.getItemStack().getCount())) {
+                        System.out.println("Space Enough!!!");
+                        // 重置页面
+                        setPage(1);
+                        // 发送移除商品数据包
+                        RemoveListedItemPacket.sendRemoveListedItemPacket(itemUUID);
+                        // 获取市场物品列表
+                        requestSearchMarketList(player.getUuid());
+                        // 添加购买的商品到玩家物品栏
+                        addItemsToPlayerInventory(getPlayer(), item.getItemStack(), item.getItemStack().getCount());
+                        // 给玩家发送消息
+                        getPlayer().sendMessage(Text.literal("Discontinue successfully!!"));
+                    }
+                });
+            } else {
+                // 如果没有足够的物品，清空对应槽位和标签
+                listedItemInterface.getShow_inventory().setStack(i, ItemStack.EMPTY);
+                listedItemInterface.getPRICE_LABELS()[i].setText(Text.literal("null"));
+                listedItemInterface.getSELLER_LABELS()[i].setText(Text.literal("null"));
+                listedItemInterface.getDISCONTINUED_BUTTONS()[i].setOnClick(() -> {
+                    System.out.println("1");
+                });
             }
         }
     }
@@ -718,7 +792,7 @@ public class HomeInterface extends SyncedGuiDescription {
         System.out.println("ChangePage!!");
         System.out.println("TotalPages: " + totalPages);
         page = Math.max(1, Math.min(totalPages, page + delta));  // 确保页数在有效范围内
-        update(page);
+        updateMarketHome(page);
     }
 
     public BankInterface getBankInterface() {
@@ -787,5 +861,13 @@ public class HomeInterface extends SyncedGuiDescription {
 
     public void setPlayerInventory(PlayerInventory playerInventory) {
         this.playerInventory = playerInventory;
+    }
+
+    public List<ListedItem> getMarketItemsBySearching() {
+        return marketItemsBySearching;
+    }
+
+    public void setMarketItemsBySearching(List<ListedItem> marketItemsBySearching) {
+        this.marketItemsBySearching = marketItemsBySearching;
     }
 }
